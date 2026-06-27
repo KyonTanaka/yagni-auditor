@@ -1,5 +1,10 @@
 # YAGNI Auditor v2.0 — Auditor de Sistemas de Skills
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Status: Production Ready](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)]()
+[![Version: 2.0](https://img.shields.io/badge/Version-2.0-blue)]()
+[![Skill: Claude Code](https://img.shields.io/badge/Skill-Claude%20Code-purple)]()
+
 **"You Aren't Gonna Need It" — Auditoría inteligente de dependencias, configuraciones y sistemas de skills.**
 
 ---
@@ -47,14 +52,38 @@ El auditor NO:
 
 ---
 
-## Instalación
+## Instalación Rápida
 
+### Opción 1: Copiar archivo (Recomendado)
 ```bash
-# Copiar skill a tu entorno Claude Code
-cp yagni-audit.md ~/.claude/skills/
+# Clone o descargue el repo
+git clone https://github.com/KyonTanaka/yagni-auditor.git
+cd yagni-auditor
 
-# O usar como comando
-/yagni-audit
+# Copie el skill a su directorio de skills
+cp yagni-audit.md ~/.claude/skills/
+```
+
+### Opción 2: Descarga directa
+```bash
+# Descargue solo el skill
+curl -L https://raw.githubusercontent.com/KyonTanaka/yagni-auditor/main/yagni-audit.md \
+  -o ~/.claude/skills/yagni-audit.md
+```
+
+### Opción 3: Copiar manualmente
+1. Descargue `yagni-audit.md` desde [releases](https://github.com/KyonTanaka/yagni-auditor/releases)
+2. Copie a `~/.claude/skills/yagni-audit.md`
+
+### Verificar instalación
+```bash
+ls -la ~/.claude/skills/yagni-audit.md
+```
+
+### Usar el skill
+```
+Usuario: "Audita mi CLAUDE.md"
+Claude: "/yagni-audit [archivo a auditar]"
 ```
 
 ---
