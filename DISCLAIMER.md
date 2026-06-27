@@ -124,7 +124,7 @@ YAGNI Auditor está bajo licencia **MIT**.
 - ❌ SIN GARANTÍAS (incluyendo garantía de "merchantability" o "fitness for a particular purpose")
 - ❌ SIN RESPONSABILIDAD (incluyendo daños indirectos)
 
-**Texto legal completo:** Ver `LICENSE.md`
+**Texto legal completo:** Ver `LICENSE`
 
 ---
 

@@ -119,7 +119,7 @@ YAGNI Auditor es una herramienta de análisis estático y recomendación. **No s
 3. Mantén backups de configuración antes de cambios significativos
 4. YAGNI Auditor es una **segunda opinión**, no una decisión final
 
-**Licencia:** MIT. Ver LICENSE.md para términos completos.
+**Licencia:** MIT. Ver LICENSE para términos completos.
 
 ---
 
@@ -202,7 +202,7 @@ Si encuentras casos donde YAGNI Auditor se equivoca, abre un issue con:
 
 ## Licencia
 
-MIT. Verifica `LICENSE.md` para términos legales completos.
+MIT. Verifica `LICENSE` para términos legales completos.
 
 ---
 
