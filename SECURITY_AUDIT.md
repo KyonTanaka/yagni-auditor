@@ -151,7 +151,7 @@ YAGNI NUNCA:
 - [x] EXAMPLES.md con 3+ casos reales
 - [x] DISCLAIMER.md legal y exhaustivo
 - [x] Esta auditoría de seguridad incluida
-- [x] LICENSE.md (MIT) presente
+- [x] LICENSE (MIT) presente
 
 ### Responsabilidad Legal
 - [x] Disclaimer explícito (AS IS, sin garantías)
