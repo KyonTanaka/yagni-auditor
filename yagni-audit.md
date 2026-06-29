@@ -7,7 +7,7 @@
 
 ## Cómo Funciona
 
-YAGNI Auditor v3.0 audita configuraciones, manifiestos, y sistemas de skills usando análisis estático puro. 4 fases de auditoría detectan:
+YAGNI Auditor v3.1 audita configuraciones, manifiestos, y sistemas de skills usando análisis estático puro. 4 fases de auditoría detectan:
 
 1. **Mapa de Carga** — ¿Qué se carga en CADA interacción sin aportar valor? Token tax silencioso.
 2. **Catálogo vs. Comportamiento** — ¿Es regla de acción o puro directorio telefónico?
@@ -16,7 +16,7 @@ YAGNI Auditor v3.0 audita configuraciones, manifiestos, y sistemas de skills usa
 
 ---
 
-## Filosofía Core (v3.0)
+## Filosofía Core (v3.1)
 
 **YAGNI nunca asume; verifica primero.** La lección de 2026-06-29: un recomendador de "elimina X" sin verificar si X es necesario es un destructor confiado. Ante cualquier cascada, patología, o recomendación de borrado:
 
@@ -70,48 +70,128 @@ Si no puedes probar con evidencia que algo es ruido, **no lo elimines**. Las rec
 
 ---
 
-### Fase 4: Ciclos de Activación Ocultos (NEW — Lógica Corregida en v3.0)
+### Fase 4: Ciclos de Activación Ocultos (v3.1 — Trust Boundaries Integradas)
 
 **Pregunta:** ¿Hay skills que se invocan entre sí en cascada, amplificando costo?
 
-**Acción:** (CAMBIO v3.0)
-- **Paso 1:** Mapea dependencias entre skills
-- **Paso 2:** Detecta cascadas: A → B → C → D
-- **Paso 3: VERIFICACIÓN CRÍTICA** (NO asumir, siempre verificar primero):
-  1. ¿A se auto-activa o requiere invocación explícita del usuario?
-  2. ¿B, C, D tienen triggers claros definidos o son opcionales?
-  3. ¿El usuario necesita la cascada juntos, o es ruido detectable?
-- **Paso 4:** Calcula multiplicación de costo solo si la cascada es REAL (auto-activada)
+**Acción:** (CAMBIO v3.1 — Anti-Falsos-Positivos)
 
-**Ejemplo correcto (Fase 4 v3.0):**
+**Paso 1: Mapea**
+- Identifica dependencias entre skills en la Tabla Maestra
+- Busca símbolos `→` o palabras clave: "auto", "cascada", "auto-inicia"
+
+**Paso 2: Detecta Cascadas**
+- Cascada = A → B → C (secuencia)
+- Marca cada cascada encontrada
+
+**Paso 3: ESTABLECE-TRUST-BOUNDARIES (NEW — Evita Falsos Positivos)**
+Antes de verificar, pregunta:
+  a) ¿Está la cascada documentada EN LA TABLA MAESTRA?
+  b) ¿Hay notas/aclaraciones sobre esta cascada específica?
+  c) ¿Qué dijo el usuario explícitamente en columna "Cuándo"?
+  
+Si hay contradicción (tabla vs notas) → marca `[REQUIERE-CONFIRMACIÓN]`, no asumas.
+Si hay claridad total → avanza a Paso 4.
+
+**Paso 4: VERIFICA CON CONTEXTO COMPLETO (MEJORADO)**
+LEE SIEMPRE:
+  - Línea principal (tabla)
+  - Contexto arriba/abajo (±5 líneas mínimo)
+  - Notas/Aclaraciones sobre ESA tarea específica
+  - Límites explícitos: "Cuándo", triggers
+
+RESPONDE LAS 3 PREGUNTAS CLAVE (Contexto Completo):
+  1. ¿Se auto-activa o requiere invocación explícita? (Mira "Cuándo")
+  2. ¿Multiplica costo de verdad o es flujo intencional? (Mira "Por qué")
+  3. ¿El usuario lo documentó como necesario juntos? (Mira Notas)
+
+**Paso 5: VALIDA-VALIDACIÓN (NEW — Auto-Verificación)**
+Auto-pregunta crítica:
+  - ¿Mi conclusión contradice algo en el documento?
+  - ¿Leí TODO el contexto o solo la línea principal?
+  - ¿Hay una nota diciendo "si necesitas ese flujo, lo pides explícitamente"?
+
+Si respondiste NO a alguna → Vuelve a Paso 4, lee contexto completo.
+Si respondiste SÍ a todas → Procede a Paso 6.
+
+**Paso 6: RECOMIENDA (Solo después de 5 pasos previos)**
+- Si auto-activada SIN documentación clara → `[CRÍTICO] "Romper cascada"`
+- Si documentada como intencional EN TABLA Y NOTAS → `[VERIFICADO] "Mantener"`
+- Si hay conflicto tabla vs notas → `[REQUIERE-CONFIRMACIÓN] "Usuario decide"`
+- Si cascada existe pero usuario dice "pide explícitamente" → `[VERIFICADO] "Flujo intencional, no es cascada oculta"`
+
+**Ejemplo correcto (Fase 4 v3.1):**
 ```
 HALLAZGO: Cascada detectada autoplan → review → qa → land-and-deploy
 
-VERIFICACIÓN:
-  1. ¿autoplan se auto-activa? NO — requiere /autoplan explícito
-  2. ¿review tiene trigger automático? NO — requiere /review explícito
-  3. ¿qa se lanza solo? NO — requiere /qa explícito
-  4. ¿land-and-deploy se ejecuta solo? NO — requiere /ship explícito
+VERIFICACIÓN (6 PASOS):
+Paso 1-2: Detecta cascada con símbolo →
+Paso 3 (TRUST-BOUNDARIES): Lee tabla + notas
+  - Tabla Maestra: "Cuándo: Antes de hacer push"
+  - Notas: "Si necesitas ese flujo, lo pides explícitamente"
+Paso 4 (VERIFICA CONTEXTO): 
+  1. ¿Auto-activa? NO — "Antes de hacer push" = usuario inicia
+  2. ¿Multiplica costo? NO — son herramientas complementarias
+  3. ¿Documentado como necesario? SÍ — ambas verifican aspectos diferentes
+Paso 5 (VALIDA-VALIDACIÓN): ¿Contradicción? NO. ¿Contexto completo? SÍ. ¿Hay nota explícita? SÍ.
+Paso 6 (RECOMIENDA): [VERIFICADO] "Flujo intencional — usuario pide explícitamente"
 
 CONCLUSIÓN: No es cascada oculta, es un flujo INTENCIONAL. El usuario los invoca explícitamente cuando los necesita juntos.
 RECOMENDACIÓN: MANTENER — es un patrón de flujo bien documentado.
+```
 
 ---
 
-CONTRAEJEMPLO (Cascada Real):
-HALLAZGO: Cascada brainstorming → writing-plans → autoplan → code-review
+### Anti-Falsos-Positivos: 5 Reglas Críticas
 
-VERIFICACIÓN:
-  1. ¿brainstorming se auto-activa? Investigar: ¿está en tabla maestro de auto-activación?
-     Resultado: SÍ — se auto-activa en "feature nueva >2 archivos"
-  2. ¿writing-plans tiene trigger automático desde brainstorming?
-     Resultado: SÍ — brainstorming lanza automáticamente writing-plans
-  3. ¿autoplan se activa automáticamente desde writing-plans?
-     Resultado: SÍ — writing-plans invoca autoplan sin pedirlo al usuario
+1. **EL SÍMBOLO → NO GARANTIZA CASCADA AUTOMÁTICA**
+   - El símbolo `→` en la Tabla Maestra indica relación, NO auto-activación
+   - SIEMPRE lee la columna "Cuándo" para saber si es explícita o automática
+   - Ejemplo: `/code-review` → `/pr-review-toolkit` con "Cuándo: Antes de push" = explícita, no cascada oculta
 
-CONCLUSIÓN: Sí es cascada oculta peligrosa. Amplifica token tax: 1,840 × 3 = 5,520 tokens sin que lo sepa el usuario.
-RECOMENDACIÓN: ROMPER — separa triggers. Usuario debe invocar cada skill que necesite.
-```
+2. **LEER CONTEXTO ±5 LÍNEAS SIEMPRE**
+   - Analizar una línea aislada = falso positivo garantizado
+   - Línea 42 sola ≠ Línea 42 + Línea 106
+   - Regla: Si encuentras cascada sospechosa, lee la sección de Notas sobre esa tarea
+
+3. **SI HAY CONTRADICCIÓN, MARCA [REQUIERE-CONFIRMACIÓN]**
+   - No asumas cuál lado tiene razón (tabla vs notas)
+   - El usuario decide la intención, no el auditor
+   - Ejemplo: Tabla dice "cascada" pero Notas dicen "si necesitas, lo pides" → conflicto, requiere confirmación
+
+4. **CASCADA INTENCIONAL ≠ CASCADA PELIGROSA**
+   - Intencional: documentada, el usuario la pidió, tiene sentido lógico → MANTENER
+   - Peligrosa: oculta, auto-activa sin control documentado → ROMPER
+   - Ambas tienen `→`, pero una es feature, otra es bug
+
+5. **SIEMPRE LEE LA COLUMNA "CUÁNDO" PRIMERO**
+   - "Cuándo: Explícitamente cuando pidas X" → NO es cascada oculta
+   - "Cuándo: Inmediatamente si Y" → Posible cascada automática, verifica
+   - "Cuándo: Auto-sugerir" → Cascada oculta, probablemente problema
+
+---
+
+**Ejemplo v3.1 — Evitando Falso Positivo:**
+
+ESCENARIO: Auditando `code-review → pr-review-toolkit`
+SÍNTOMA: Símbolo → detectado, parece cascada automática
+FALSO POSITIVO v3.0: "Romper cascada /code-review → /pr-review-toolkit"
+
+VERIFICACIÓN v3.1 (6 pasos):
+- Paso 1-2: Detecta cascada
+- Paso 3 (TRUST-BOUNDARIES): Lee Tabla + Notas
+  - Tabla Maestra línea 42: "Cuándo: Antes de hacer push"
+  - Notas línea 106: "Si necesitas ese flujo, lo pides explícitamente"
+- Paso 4 (VERIFICA CONTEXTO): 
+  - ¿Auto-activa? NO — "Antes de push" = usuario inicia
+  - ¿Multiplica costo? NO — son herramientas complementarias, el usuario las usa juntas cuando decide hacerlo
+  - ¿Documentado como necesario? SÍ — ambas verifican aspectos diferentes (bugs vs estilo)
+- Paso 5 (VALIDA-VALIDACIÓN): ¿Contradicción? NO. ¿Leí contexto completo? SÍ. ¿Hay nota explícita? SÍ.
+- Paso 6 (RECOMIENDA): `[VERIFICADO] "Flujo intencional — usuario pide explícitamente"`
+
+RESULTADO: Cero falso positivo. Cascada respetada.
+
+---
 
 **Salida:** Grafo de cascadas CON verificación. Recomendación: rompe SOLO cascadas auto-activadas.
 
@@ -138,14 +218,15 @@ RECOMENDACIÓN: ROMPER — separa triggers. Usuario debe invocar cada skill que 
 
 ---
 
-## Output: Reporte YAGNI (v3.0 — Verificación Integrada)
+## Output: Reporte YAGNI (v3.1 — Verificación Integrada + Anti-Falsos-Positivos)
 
 Cada auditoría genera reporte estructurado CON marca de verificación:
 
 ```
 ╔═════════════════════════════════════════════════════════════╗
-║              YAGNI AUDIT REPORT — v3.0                    ║
+║              YAGNI AUDIT REPORT — v3.1                    ║
 ║           (con Verificación Crítica en Fase 4)             ║
+║       (anti-falsos-positivos integrado)                    ║
 ╚═════════════════════════════════════════════════════════════╝
 
 📊 RESUMEN EJECUTIVO
@@ -168,9 +249,12 @@ Cada auditoría genera reporte estructurado CON marca de verificación:
 ├─ [Flujo autoplan → review → qa intencional; cada skill requiere invocación explícita]
 └─ [Arquitectura limpia, cero cascadas auto-activadas]
 
-📋 CHECKLIST POST-AUDIT (v3.0)
+📋 CHECKLIST POST-AUDIT (v3.1)
 □ Verificar cascadas detectadas (¿auto-activadas o explícitas?)
-□ Eliminar SOLO cascadas ocultas probadas
+□ Leer contexto ±5 líneas para cada hallazgo
+□ Buscar notas/aclaraciones sobre cascadas sospechosas
+□ Aplicar 5 reglas anti-falsos-positivos
+□ Eliminar SOLO cascadas ocultas probadas (paso 6)
 □ Respetar flujos intencionales documentados
 □ Eliminar/mover catálogos puros
 □ Consolidar opciones competidoras
@@ -207,6 +291,10 @@ Cada auditoría genera reporte estructurado CON marca de verificación:
 - ✅ Testing en staging antes de producción
 - ✅ Cambios incrementales (uno a la vez)
 - ✅ Respeto por flujos intencionales documentados (v3.0)
+- ✅ "v3.1: Trust Boundaries integrados — lee contexto completo antes de recomendar"
+- ✅ "v3.1: Checklist binaria — SÍ/NO, no interpretación subjetiva"
+- ✅ "NO asume cascadas por símbolo `→` sin contexto"
+- ✅ "NO analiza líneas aisladas — siempre ±5 líneas mínimo"
 
 ---
 
@@ -230,7 +318,7 @@ Reporte: Score 3.1/10 si X trae 3+ dependencias similares a lo que ya tienes.
          Recomendación: Rechazar o usar stdlib.
 ```
 
-### 3. Auditar Después de Cambios (CON VERIFICACIÓN v3.0)
+### 3. Auditar Después de Cambios (CON VERIFICACIÓN v3.1)
 
 ```
 Usuario: "Agregué 5 nuevos skills al CLAUDE.md"
@@ -238,11 +326,16 @@ Claude: "/yagni-audit [lee CLAUDE.md nuevo]"
 
 HALLAZGO: "Detecté cascada autoplan → review → qa → land-and-deploy"
 
-VERIFICACIÓN (Fase 4 v3.0):
+VERIFICACIÓN (Fase 4 v3.1 — 6 PASOS):
+Paso 1-2: Detecta cascada con símbolo →
+Paso 3 (TRUST-BOUNDARIES): Lee Tabla + Notas
+Paso 4 (VERIFICA CONTEXTO):
   1. ¿autoplan se auto-activa? → NO, requiere /autoplan explícito
   2. ¿review se lanza automáticamente desde autoplan? → NO, requiere /review explícito
   3. ¿qa se activa desde review? → NO, requiere /qa explícito
   4. ¿land-and-deploy se ejecuta solo? → NO, requiere /ship explícito
+Paso 5 (VALIDA-VALIDACIÓN): Contexto completo leído, sin contradicciones
+Paso 6 (RECOMIENDA): [VERIFICADO] "Flujo intencional"
 
 CONCLUSIÓN: No es cascada oculta. Es un flujo intencional donde el usuario invoca cada skill.
 
@@ -261,11 +354,16 @@ Claude: "/yagni-audit cascadas en superpowers"
 
 HALLAZGO: brainstorming → writing-plans → autoplan → code-review
 
-VERIFICACIÓN:
+VERIFICACIÓN (6 PASOS):
+Paso 1-2: Detecta cascada
+Paso 3 (TRUST-BOUNDARIES): Lee tabla + notas explícitas
+Paso 4 (VERIFICA CONTEXTO):
   1. ¿brainstorming se auto-activa? SÍ — tabla maestro, feature >2 archivos
   2. ¿writing-plans se lanza automáticamente desde brainstorming? SÍ
   3. ¿autoplan se lanza automáticamente desde writing-plans? SÍ
   4. ¿code-review se lanza automáticamente desde autoplan? SÍ
+Paso 5 (VALIDA-VALIDACIÓN): Contexto completo, cascada verificada real
+Paso 6 (RECOMIENDA): [VERIFICADO — ES cascada oculta peligrosa]
 
 CONCLUSIÓN: [VERIFICADO — ES cascada oculta peligrosa]
 Token tax: 1,840 tokens × 4 = 7,360 sin que el usuario lo controle.
@@ -297,7 +395,7 @@ Recomendación: ROMPER cascada automática. Usuario debe invocar /review y /qa e
 
 ---
 
-**Versión:** 3.0 (2026-06-29)  
-**Cambios en v3.0:** Fase 4 corregida — verifica cascadas antes de recomendar borrado. Filosofía "nunca asume, verifica primero". Ejemplos actualizados con flujo de verificación.  
+**Versión:** 3.1 (2026-06-29 — Anti-Falsos-Positivos)  
+**Cambios en v3.1:** Fase 4 refactorizada — 4 pasos → 6 pasos con Trust Boundaries integrados. Nueva sección "Anti-Falsos-Positivos: 5 Reglas Críticas". Checklist mejorado. Ejemplos v3.1 con flujo completo de 6 pasos. Limitaciones actualizadas. Cero cambios en Fases 1-3.  
 **Estado:** Production Ready  
 **Análisis:** Estático puro (cero ejecución, cero telemetría)
