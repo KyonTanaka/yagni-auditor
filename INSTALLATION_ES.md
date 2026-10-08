@@ -1,5 +1,13 @@
 # Guía de Instalación — YAGNI Auditor v2.0
 
+> **Método vigente (2026-10):** Claude Code solo carga skills que estén en una carpeta con `SKILL.md`. Copiar `yagni-audit.md` suelto en `~/.claude/skills/` (método descrito más abajo) **no carga la skill**. Instala clonando el repositorio completo:
+>
+> ```bash
+> git clone https://github.com/KyonTanaka/yagni-auditor.git ~/.claude/skills/yagni-auditor
+> ```
+>
+> Luego abre una sesión nueva de Claude Code y usa `/yagni-audit`. Para actualizar: `git -C ~/.claude/skills/yagni-auditor pull`.
+
 ## Requisitos
 
 - ✅ Claude Code (versión 1.0+)
